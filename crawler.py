@@ -1,5 +1,4 @@
 from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
 
 driver = webdriver.Firefox()
 driver.get("http://w1.c1.rada.gov.ua/pls/radan_gs09/ns_h1")
@@ -21,14 +20,25 @@ for link in voting_days:
         expand = driver.find_elements_by_xpath("//div[@class='vid_d']/p[@id='name_input']")
         expand[0].click()
 
-        trials = driver.find_elements_by_xpath('//div[@class="block_pd"]')
-        for elem in trials:
-            trail_numbers = [elem.get_attribute("innerHTML") for elem in trials_num]
+        trails = []
+        for row in driver.find_elements_by_xpath("//div[@id='Data_gol']/*[@id='list_g']/ul/li"):
+            try:
+                row_id = row.find_element_by_xpath(".//div[@class='fr_nomer']").get_attribute("innerHTML")
+                row_id = int(row_id.replace(".", ""))
+                date = row.find_element_by_xpath(".//div[@class='fr_data']").text  # 'fr_data'
+                descr = row.find_element_by_xpath(".//div[@class='fr_nazva']").text
+                descr = descr.split("\n")[0]
+                votes = row.find_element_by_xpath(".//div[@class='fr_nazva']//center").text
+                rishennya = votes.split("-")[-1].split(" ", 1)[1]
+                trails.append((row_id, date, descr, rishennya))
+            except:
+                print("Error\n Row: \n {0}".format(row.text))
+
+        trails_table = []
+        for elem in trails:
+            if "Поіменне голосування про проект Закону" in elem[2]:
+                trails_table.append(elem)
 
 
-        trials_num = driver.find_elements_by_xpath('//div[@class="fr_nomer"]')
-        trail_numbers = [elem.get_attribute("innerHTML") for elem in trials_num]
-        trail_numbers = [elem for elem in trail_numbers if '-' not in elem]
-        trail_names = [elem.get_attribute("text") for elem in trials if 'про проект Закону' in elem.get_attribute("text")]
-
-
+# [num for num, law in zip(nums, laws) if "x" in law]
+# ".//*[@id='list_g']"
