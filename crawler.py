@@ -54,7 +54,6 @@ for vote in votes:
             color = 'didnotvote'
         else:
             color = 'absent'
-    
     colored_votes.append(color)
     # if votes[elem].find_elements_by_xpath("//tr[elem]/td[@style='color:Yellow;']"):
     #     votes[elem] = "utrymavsya"
